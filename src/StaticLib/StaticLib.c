@@ -35,6 +35,39 @@ void release(my_array* ar)
 void resize(my_array* ar, int n)
 {
 	// ToDo:配列の要素数を変更しよう！(reallocは禁止)
+	if (ar == NULL) return;
+	// n <= 0 の場合は空にする
+	if (n <= 0) {
+		free(ar->addr);
+		ar->addr = NULL;
+		ar->num = 0;
+		return;
+	}
+
+	// 新しい配列を確保
+	int* new_addr = (int*)malloc(sizeof(int) * n); // malloc
+	if (new_addr == NULL) {
+
+		return; //メモリ確保失敗時は何もしない
+	}
+	//小さい方をコピー
+	int copy_size = 0;
+	if (ar->addr != NULL && ar->num > 0) { // ar->addrがNULLの場合はコピーしない
+		copy_size = (n < ar->num) ? n : ar->num; //三項演算子
+	}
+
+	// 古い配列の先頭からcopy_size個分のデータを、新しい配列にコピー
+	if (copy_size > 0) {
+		memcpy(new_addr, ar->addr, (size_t)copy_size * sizeof(int));
+	}
+	// memcpy(コピー先, コピー元, コピーするバイト数);
+	// for (int i = 0; i < copy_size; i++) { new_addr[i] = ar->addr[i]; }では安全性(Error:C6386)に欠けていた
+
+	// 古い配列を解放
+	free(ar->addr);
+	// ポインタを更新
+	ar->addr = new_addr;
+	ar->num = n;
 }
 
 // my_array のindex番目の要素にvalを設定する
@@ -42,7 +75,10 @@ void resize(my_array* ar, int n)
 bool set(my_array* ar, int index, int val)
 {
 	// ToDo:配列の要素を変更しよう！
-	return false;
+	if (ar == NULL || index < 0 || index >= ar->num) return false; //ar->num <= index < 0
+
+	ar->addr[index] = val; // index番目の要素にvalを設定
+	return true;
 }
 
 // my_array のindex番目の要素を取得する
@@ -50,12 +86,14 @@ bool set(my_array* ar, int index, int val)
 int get(const my_array* ar, int index)
 {
 	// ToDo:要素を所得して、indexがおかしかったら0を返そう
-	return -1;
+	if (ar == NULL || index < 0 || index >= ar->num) return 0; // 0を返す
+	return ar->addr[index]; // 要素取得
 }
 
 // my_array の要素数を取得する
 int size(const my_array* ar)
 {
 	// ToDo: 配列の要素数を返そう
-	return -1;
+	if (ar == NULL) return 0; // 0を返す
+	return ar->num; // 要素数取得
 }
