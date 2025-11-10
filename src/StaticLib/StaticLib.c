@@ -35,14 +35,29 @@ void release(my_array* ar)
 void resize(my_array* ar, int n)
 {
 	// ToDo:配列の要素数を変更しよう！(reallocは禁止)
+	if (ar == NULL) return;
+	int* a = (int*)malloc(sizeof(int) * n);
+	if (a == NULL)return;
+
+	if (ar->addr != NULL) {
+		memcpy_s(a, sizeof(int) * n,
+			ar->addr, sizeof(int) * min(n, ar->num));
+	}
+	ar->addr = a;
+	ar->num = n;
+
 }
 
 // my_array のindex番目の要素にvalを設定する
 // index が確保されていない場所を指していたら返り値をfalseにする（設定出来たらtrue）
-bool set(my_array* ar, int index, int val)
+bool set(my_array * ar, int index, int val)
 {
 	// ToDo:配列の要素を変更しよう！
-	return false;
+	if (ar == NULL || ar->addr == NULL ||
+		index < 0 || ar->num <= index)return false;
+	ar->addr[index] = val;
+
+	return true;
 }
 
 // my_array のindex番目の要素を取得する
@@ -50,12 +65,16 @@ bool set(my_array* ar, int index, int val)
 int get(const my_array* ar, int index)
 {
 	// ToDo:要素を所得して、indexがおかしかったら0を返そう
-	return -1;
+	if (ar == NULL || ar->addr == NULL ||
+		index < 0 || ar->num <= index)return 0;
+	return ar->addr[index];
 }
 
 // my_array の要素数を取得する
 int size(const my_array* ar)
 {
 	// ToDo: 配列の要素数を返そう
-	return -1;
+	if (ar == NULL || ar->addr == NULL)return 0;
+
+	return ar->num;
 }
